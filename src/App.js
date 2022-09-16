@@ -6,6 +6,7 @@ import "firebase/compat/auth";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useState } from "react";
+import { useRef } from "react";
 
 firebase.initializeApp({
   apiKey: "AIzaSyCBaeaRU3A5mR9ZQdtb9TtMh0AlvjXCfKY",
@@ -46,6 +47,7 @@ function SignOut() {
 function ChatRoom() {
   const messagesRef = firestore.collection("messages");
   const query = messagesRef.orderBy("createdAt").limit(25);
+  const dummy = useRef();
 
   const [messages] = useCollectionData(query, { idField: "id" });
   const [formValue, setFormValue] = useState("");
@@ -53,7 +55,8 @@ function ChatRoom() {
   const sendMessage = async (e) => {
     e.preventDefault();
     const { uid, photoURL } = auth.currentUser;
-    console.log(currentUser);
+    console.log(auth.currentUser);
+
     await messagesRef.add({
       text: formValue,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -62,15 +65,20 @@ function ChatRoom() {
     });
 
     setFormValue("");
+
+    //scrolls to the bottom of the page everytime a new message is send
+    dummy.current.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
     <>
       <SignOut />
-      <div>
+      <main>
         {messages &&
           messages.map((msg) => <ChatMessage key={msg.id} message={msg} />)}
-      </div>
+
+        <div ref={dummy}></div>
+      </main>
 
       <form onSubmit={sendMessage}>
         <input
@@ -88,7 +96,7 @@ function ChatMessage(props) {
 
   //determine message CSS class:
   //is the message send by current user or other users?
-  const messageClass = uid === auth.currentUser.uid ? "send" : "received";
+  const messageClass = uid === auth.currentUser.uid ? ".send" : ".received";
 
   return (
     <div>
