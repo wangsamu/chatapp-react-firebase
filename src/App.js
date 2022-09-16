@@ -24,7 +24,10 @@ function App() {
   const [user] = useAuthState(auth);
   return (
     <div className="App">
-      <header></header>
+      <header>
+        <h1>Foca Chat Room ⚛️🔥💬</h1>
+        <SignOut />
+      </header>
       <section>{user ? <ChatRoom /> : <SignIn />}</section>
     </div>
   );
@@ -35,27 +38,36 @@ function SignIn() {
     const provider = new firebase.auth.GoogleAuthProvider();
     auth.signInWithPopup(provider);
   };
-  return <button onClick={signInWithGoogle}>Sign in with Google</button>;
+  return (
+    <button className="sign-in" onClick={signInWithGoogle}>
+      Sign in with Google
+    </button>
+  );
 }
 
 function SignOut() {
   return (
-    auth.currentUser && <button onClick={() => auth.SignOut}>Sign Out</button>
+    auth.currentUser && (
+      <button className="sign-out" onClick={() => auth.signOut()}>
+        Sign Out
+      </button>
+    )
   );
 }
 
 function ChatRoom() {
+  const dummy = useRef();
   const messagesRef = firestore.collection("messages");
   const query = messagesRef.orderBy("createdAt").limit(25);
-  const dummy = useRef();
 
   const [messages] = useCollectionData(query, { idField: "id" });
+  console.log(messages);
   const [formValue, setFormValue] = useState("");
 
   const sendMessage = async (e) => {
     e.preventDefault();
+
     const { uid, photoURL } = auth.currentUser;
-    console.log(auth.currentUser);
 
     await messagesRef.add({
       text: formValue,
@@ -72,20 +84,25 @@ function ChatRoom() {
 
   return (
     <>
-      <SignOut />
       <main>
         {messages &&
-          messages.map((msg) => <ChatMessage key={msg.id} message={msg} />)}
+          messages.map((msg) => {
+            console.log(msg.id);
+            return <ChatMessage key={msg.id} message={msg} />;
+          })}
 
-        <div ref={dummy}></div>
+        <span ref={dummy}></span>
       </main>
 
       <form onSubmit={sendMessage}>
         <input
           value={formValue}
           onChange={(e) => setFormValue(e.target.value)}
+          placeholder="Message"
         />
-        <button type="submit ">👾</button>
+        <button type="submit " disabled={!formValue}>
+          🛫
+        </button>
       </form>
     </>
   );
@@ -96,12 +113,12 @@ function ChatMessage(props) {
 
   //determine message CSS class:
   //is the message send by current user or other users?
-  const messageClass = uid === auth.currentUser.uid ? ".send" : ".received";
+  const messageClass = uid === auth.currentUser.uid ? "sent" : "received";
 
   return (
-    <div>
-      <img src={photoURL} />
-      <p className={`message ${messageClass}`}>{text}</p>
+    <div className={`message ${messageClass}`}>
+      <img src={photoURL || "https://picsum.photos/200"} />
+      <p>{text}</p>
     </div>
   );
 }
