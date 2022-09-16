@@ -50,8 +50,23 @@ function ChatRoom() {
   const [messages] = useCollectionData(query, { idField: "id" });
   const [formValue, setFormValue] = useState("");
 
+  const sendMessage = async (e) => {
+    e.preventDefault();
+    const { uid, photoURL } = auth.currentUser;
+    console.log(currentUser);
+    await messagesRef.add({
+      text: formValue,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      uid,
+      photoURL,
+    });
+
+    setFormValue("");
+  };
+
   return (
     <>
+      <SignOut />
       <div>
         {messages &&
           messages.map((msg) => <ChatMessage key={msg.id} message={msg} />)}
@@ -62,7 +77,7 @@ function ChatRoom() {
           value={formValue}
           onChange={(e) => setFormValue(e.target.value)}
         />
-        <button type="submit ">🦦</button>
+        <button type="submit ">👾</button>
       </form>
     </>
   );
@@ -73,7 +88,7 @@ function ChatMessage(props) {
 
   //determine message CSS class:
   //is the message send by current user or other users?
-  const messageClass = uid === currentUser.auth.uid ? "send" : "received";
+  const messageClass = uid === auth.currentUser.uid ? "send" : "received";
 
   return (
     <div>
