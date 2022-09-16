@@ -5,6 +5,7 @@ import "firebase/compat/auth";
 
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollectionData } from "react-firebase-hooks/firestore";
+import { useState } from "react";
 
 firebase.initializeApp({
   apiKey: "AIzaSyCBaeaRU3A5mR9ZQdtb9TtMh0AlvjXCfKY",
@@ -47,12 +48,22 @@ function ChatRoom() {
   const query = messagesRef.orderBy("createdAt").limit(25);
 
   const [messages] = useCollectionData(query, { idField: "id" });
+  const [formValue, setFormValue] = useState("");
+
   return (
     <>
       <div>
         {messages &&
           messages.map((msg) => <ChatMessage key={msg.id} message={msg} />)}
       </div>
+
+      <form onSubmit={sendMessage}>
+        <input
+          value={formValue}
+          onChange={(e) => setFormValue(e.target.value)}
+        />
+        <button type="submit ">🦦</button>
+      </form>
     </>
   );
 }
