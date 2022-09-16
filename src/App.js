@@ -1,8 +1,7 @@
-import logo from "./logo.svg";
 import "./App.css";
-import firebase from "firebase/firebase-app";
-import "firebase/firestore";
-import "firebase/auth";
+import firebase from "firebase/compat/app";
+import "firebase/compat/firestore";
+import "firebase/compat/auth";
 
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollectionData } from "react-firebase-hooks/firestore";
@@ -19,9 +18,8 @@ firebase.initializeApp({
 const auth = firebase.auth();
 const firestore = firebase.firestore();
 
-const [user] = useAuthState(auth);
-
 function App() {
+  const [user] = useAuthState(auth);
   return (
     <div className="App">
       <header></header>
@@ -38,6 +36,39 @@ function SignIn() {
   return <button onClick={signInWithGoogle}>Sign in with Google</button>;
 }
 
-function ChatRoom() {}
+function SignOut() {
+  return (
+    auth.currentUser && <button onClick={() => auth.SignOut}>Sign Out</button>
+  );
+}
 
+function ChatRoom() {
+  const messagesRef = firestore.collection("messages");
+  const query = messagesRef.orderBy("createdAt").limit(25);
+
+  const [messages] = useCollectionData(query, { idField: "id" });
+  return (
+    <>
+      <div>
+        {messages &&
+          messages.map((msg) => <ChatMessage key={msg.id} message={msg} />)}
+      </div>
+    </>
+  );
+}
+
+function ChatMessage(props) {
+  const { text, uid, photoURL } = props.message;
+
+  //determine message CSS class:
+  //is the message send by current user or other users?
+  const messageClass = uid === currentUser.auth.uid ? "send" : "received";
+
+  return (
+    <div>
+      <img src={photoURL} />
+      <p className={`message ${messageClass}`}>{text}</p>
+    </div>
+  );
+}
 export default App;
