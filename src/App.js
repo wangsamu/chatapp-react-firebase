@@ -1,20 +1,20 @@
-import "./App.css";
-import firebase from "firebase/compat/app";
-import "firebase/compat/firestore";
-import "firebase/compat/auth";
+import './App.css';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
+import 'firebase/compat/auth';
 
-import { useAuthState } from "react-firebase-hooks/auth";
-import { useCollectionData } from "react-firebase-hooks/firestore";
-import { useState } from "react";
-import { useRef } from "react";
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { useCollectionData } from 'react-firebase-hooks/firestore';
+import { useState } from 'react';
+import { useRef } from 'react';
 
 firebase.initializeApp({
-  apiKey: "AIzaSyCBaeaRU3A5mR9ZQdtb9TtMh0AlvjXCfKY",
-  authDomain: "chatapp-91b6a.firebaseapp.com",
-  projectId: "chatapp-91b6a",
-  storageBucket: "chatapp-91b6a.appspot.com",
-  messagingSenderId: "507826548855",
-  appId: "1:507826548855:web:a1905799bce61e59b01672",
+  apiKey: 'AIzaSyCBaeaRU3A5mR9ZQdtb9TtMh0AlvjXCfKY',
+  authDomain: 'chatapp-91b6a.firebaseapp.com',
+  projectId: 'chatapp-91b6a',
+  storageBucket: 'chatapp-91b6a.appspot.com',
+  messagingSenderId: '507826548855',
+  appId: '1:507826548855:web:a1905799bce61e59b01672',
 });
 
 const auth = firebase.auth();
@@ -23,9 +23,9 @@ const firestore = firebase.firestore();
 function App() {
   const [user] = useAuthState(auth);
   return (
-    <div className="App">
+    <div className='App'>
       <header>
-        <h1>Foca Chat Room ⚛️🔥💬</h1>
+        <h1>Realtime Chatroom ⚛️🔥💬</h1>
         <SignOut />
       </header>
       <section>{user ? <ChatRoom /> : <SignIn />}</section>
@@ -39,7 +39,7 @@ function SignIn() {
     auth.signInWithPopup(provider);
   };
   return (
-    <button className="sign-in" onClick={signInWithGoogle}>
+    <button className='sign-in' onClick={signInWithGoogle}>
       Sign in with Google
     </button>
   );
@@ -48,7 +48,7 @@ function SignIn() {
 function SignOut() {
   return (
     auth.currentUser && (
-      <button className="sign-out" onClick={() => auth.signOut()}>
+      <button className='sign-out' onClick={() => auth.signOut()}>
         Sign Out
       </button>
     )
@@ -57,12 +57,12 @@ function SignOut() {
 
 function ChatRoom() {
   const dummy = useRef();
-  const messagesRef = firestore.collection("messages");
-  const query = messagesRef.orderBy("createdAt").limit(25);
+  const messagesRef = firestore.collection('messages');
+  const query = messagesRef.orderBy('createdAt').limit(25);
 
-  const [messages] = useCollectionData(query, { idField: "id" });
+  const [messages] = useCollectionData(query, { idField: 'id' });
   console.log(messages);
-  const [formValue, setFormValue] = useState("");
+  const [formValue, setFormValue] = useState('');
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -76,10 +76,10 @@ function ChatRoom() {
       photoURL,
     });
 
-    setFormValue("");
+    setFormValue('');
 
     //scrolls to the bottom of the page everytime a new message is send
-    dummy.current.scrollIntoView({ behavior: "smooth" });
+    dummy.current.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -98,9 +98,9 @@ function ChatRoom() {
         <input
           value={formValue}
           onChange={(e) => setFormValue(e.target.value)}
-          placeholder="Message"
+          placeholder='Message'
         />
-        <button type="submit " disabled={!formValue}>
+        <button type='submit ' disabled={!formValue}>
           🛫
         </button>
       </form>
@@ -113,11 +113,11 @@ function ChatMessage(props) {
 
   //determine message CSS class:
   //is the message send by current user or other users?
-  const messageClass = uid === auth.currentUser.uid ? "sent" : "received";
+  const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received';
 
   return (
     <div className={`message ${messageClass}`}>
-      <img src={photoURL || "https://picsum.photos/200"} />
+      <img src={photoURL || 'https://picsum.photos/200'} />
       <p>{text}</p>
     </div>
   );
